@@ -1,101 +1,189 @@
-
-import { useContext, useEffect, useState } from "react";
-import { BrowserRouter } from "react-router-dom";
-import Heading from "./components/Heading/Heading";
-import Text from "./components/Text/Text";
-import Menu from "./widgets/Menu/Menu";
-import { LangType } from "./widgets/Menu/types";
-import { links } from "./widgets/Menu/config";
-import { ThemeContext, ThemeProvider } from 'styled-components';
+import React, { lazy } from 'react'
+import { Router, Redirect, Route, Switch } from 'react-router-dom'
+import { ResetCSS } from '@pancakeswap/uikit'
+import { useWeb3React } from '@web3-react/core'
+import BigNumber from 'bignumber.js'
+import useEagerConnect from 'hooks/useEagerConnect'
+import useUserAgent from 'hooks/useUserAgent'
+import useScrollOnRouteChange from 'hooks/useScrollOnRouteChange'
+import { usePollBlockNumber } from 'state/block/hooks'
+import { usePollCoreFarmData } from 'state/farms/hooks'
+import { useFetchProfile } from 'state/profile/hooks'
+import { DatePickerPortal } from 'components/DatePicker'
+import { nftsBaseUrl } from 'views/Nft/market/constants'
+import GlobalStyle from './style/Global'
+import Menu from './components/Menu'
+import SuspenseWithChunkError from './components/SuspenseWithChunkError'
+import { ToastListener } from './contexts/ToastsContext'
+import PageLoader from './components/Loader/PageLoader'
+import EasterEgg from './components/EasterEgg'
+import GlobalCheckClaimStatus from './components/GlobalCheckClaimStatus'
+import history from './routerHistory'
+// Views included in the main bundle
+import Pools from './views/Pools'
+import Swap from './views/Swap'
 import {
-    light as lightBase,
-    dark as darkBase,
-    PancakeTheme
-} from './theme';
+  RedirectDuplicateTokenIds,
+  RedirectOldAddLiquidityPathStructure,
+  RedirectToAddLiquidity,
+} from './views/AddLiquidity/redirects'
+import RedirectOldRemoveLiquidityPathStructure from './views/RemoveLiquidity/redirects'
+import { RedirectPathToSwapOnly, RedirectToSwap } from './views/Swap/redirects'
+import { useInactiveListener } from './hooks/useInactiveListener'
 
-// customize light theme
-const light: PancakeTheme = lightBase;
-// light.colors.text = '#222';
-// light.card.background = '#f4f4f4';
+// Route-based code splitting
+// Only pool is included in the main bundle because of it's the most visited page
+const Home = lazy(() => import('./views/Home'))
+const Farms = lazy(() => import('./views/Farms'))
+const FarmAuction = lazy(() => import('./views/FarmAuction'))
+const Lottery = lazy(() => import('./views/Lottery'))
+const Ifos = lazy(() => import('./views/Ifos'))
+const NotFound = lazy(() => import('./views/NotFound'))
+const Teams = lazy(() => import('./views/Teams'))
+const Team = lazy(() => import('./views/Teams/Team'))
+const TradingCompetition = lazy(() => import('./views/TradingCompetition'))
+const Predictions = lazy(() => import('./views/Predictions'))
+const PredictionsLeaderboard = lazy(() => import('./views/Predictions/Leaderboard'))
+const Voting = lazy(() => import('./views/Voting'))
+const Proposal = lazy(() => import('./views/Voting/Proposal'))
+const CreateProposal = lazy(() => import('./views/Voting/CreateProposal'))
+const AddLiquidity = lazy(() => import('./views/AddLiquidity'))
+const Liquidity = lazy(() => import('./views/Pool'))
+const PoolFinder = lazy(() => import('./views/PoolFinder'))
+const RemoveLiquidity = lazy(() => import('./views/RemoveLiquidity'))
+const Info = lazy(() => import('./views/Info'))
+const NftMarket = lazy(() => import('./views/Nft/market'))
+const ProfileCreation = lazy(() => import('./views/ProfileCreation'))
+const PancakeSquad = lazy(() => import('./views/PancakeSquad'))
 
-// customize dark theme
-const dark: PancakeTheme = darkBase;
-// dark.colors.text = '#444';
-// dark.card.background = '#111';
+// This config is required for number formatting
+BigNumber.config({
+  EXPONENTIAL_AT: 1000,
+  DECIMAL_PLACES: 80,
+})
 
-const langs: LangType[] = [...Array(20)].map((_, i) => ({ code: `en${i}`, language: `English${i}` }));
+const App: React.FC = () => {
+  const { account } = useWeb3React()
 
-const noop = function () { console.log('noop') };
+  usePollBlockNumber()
+  useEagerConnect()
+  useFetchProfile()
+  usePollCoreFarmData()
+  useScrollOnRouteChange()
+  useUserAgent()
+  useInactiveListener()
 
-const defaultProps = {
-    account: "0xbdda50183d817c3289f895a4472eb475967dc980",
-    login: noop,
-    logout: noop,
-    isDark: false,
-    toggleTheme: noop,
-    langs,
-    setLang: noop,
-    currentLang: "EN",
-    cakePriceUsd: 0.023158668932877668,
-    links,
-    profile: {
-        username: "pancakeswap",
-        image: "https://pancakeswap.finance/images/nfts/blueberries-preview.png",
-        profileLink: "/profile",
-        noProfileLink: "/no-profile",
-    }
-};
+  return (
+    <Router history={history}>
+      <ResetCSS />
+      <GlobalStyle />
+      <GlobalCheckClaimStatus excludeLocations={[]} />
+      <Menu>
+        <SuspenseWithChunkError fallback={<PageLoader />}>
+          <Switch>
+            <Route path="/" exact>
+              <Home />
+            </Route>
+            <Route exact path="/farms/auction">
+              <FarmAuction />
+            </Route>
+            <Route path="/farms">
+              <Farms />
+            </Route>
+            <Route path="/pools">
+              <Pools />
+            </Route>
+            <Route path="/lottery">
+              <Lottery />
+            </Route>
+            <Route path="/ifo">
+              <Ifos />
+            </Route>
+            <Route exact path="/teams">
+              <Teams />
+            </Route>
+            <Route path="/teams/:id">
+              <Team />
+            </Route>
+            <Route path="/create-profile">
+              <ProfileCreation />
+            </Route>
+            <Route path="/competition">
+              <TradingCompetition />
+            </Route>
+            <Route exact path="/prediction">
+              <Predictions />
+            </Route>
+            <Route path="/prediction/leaderboard">
+              <PredictionsLeaderboard />
+            </Route>
+            <Route exact path="/voting">
+              <Voting />
+            </Route>
+            <Route exact path="/voting/proposal/create">
+              <CreateProposal />
+            </Route>
+            <Route path="/voting/proposal/:id">
+              <Proposal />
+            </Route>
 
+            {/* NFT */}
+            <Route path="/nfts">
+              <NftMarket />
+            </Route>
 
-// This hook is used to simulate a props change, and force a re rendering
-const useProps = () => {
-    const [props, setProps] = useState(defaultProps);
+            <Route path="/pancake-squad">
+              <PancakeSquad />
+            </Route>
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setProps(defaultProps);
-        }, 2000);
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+            {/* Info pages */}
+            <Route path="/info">
+              <Info />
+            </Route>
 
-    return props;
-};
+            {/* Using this format because these components use routes injected props. We need to rework them with hooks */}
+            <Route exact strict path="/swap" component={Swap} />
+            <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+            <Route exact strict path="/send" component={RedirectPathToSwapOnly} />
+            <Route exact strict path="/find" component={PoolFinder} />
+            <Route exact strict path="/liquidity" component={Liquidity} />
+            <Route exact strict path="/create" component={RedirectToAddLiquidity} />
+            <Route exact path="/add" component={AddLiquidity} />
+            <Route exact path="/add/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />
+            <Route exact path="/add/:currencyIdA/:currencyIdB" component={RedirectDuplicateTokenIds} />
+            <Route exact path="/create" component={AddLiquidity} />
+            <Route exact path="/create/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />
+            <Route exact path="/create/:currencyIdA/:currencyIdB" component={RedirectDuplicateTokenIds} />
+            <Route exact strict path="/remove/:tokens" component={RedirectOldRemoveLiquidityPathStructure} />
+            <Route exact strict path="/remove/:currencyIdA/:currencyIdB" component={RemoveLiquidity} />
 
-export const App: React.FC = () => {
-    let [theme, setTheme] = useState(useContext(ThemeContext));
-    if (!theme) {
-        theme = light;
-        setTheme(theme);
-    }
-    const props = useProps();
-    return (
-        <ThemeProvider theme={theme}>
-            <BrowserRouter>
-                <Menu {...props}>
-                    <div>
-                        <Heading as="h1" mb="8px">
-                            Page body
-                        </Heading>
-                        <Text as="p">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-                            anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-                            esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                            qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                            exercitation ullamco laboris nisi ut
-                        </Text>
-                    </div>
-                </Menu>
-            </BrowserRouter>
-        </ThemeProvider>
-    );
-};
+            {/* Redirect */}
+            <Route path="/pool">
+              <Redirect to="/liquidity" />
+            </Route>
+            <Route path="/staking">
+              <Redirect to="/pools" />
+            </Route>
+            <Route path="/syrup">
+              <Redirect to="/pools" />
+            </Route>
+            <Route path="/collectibles">
+              <Redirect to="/nfts" />
+            </Route>
+            <Route path="/profile">
+              <Redirect to={`${nftsBaseUrl}/profile/${account?.toLowerCase() || ''}`} />
+            </Route>
 
-export default App;
+            {/* 404 */}
+            <Route component={NotFound} />
+          </Switch>
+        </SuspenseWithChunkError>
+      </Menu>
+      <EasterEgg iterations={2} />
+      <ToastListener />
+      <DatePickerPortal />
+    </Router>
+  )
+}
+
+export default React.memo(App)
