@@ -15,7 +15,6 @@ import {
   usePools,
   useFetchUserPools,
   useFetchCakeVault,
-  useFetchIfoPool,
   useVaultPools,
 } from 'state/pools/hooks'
 import { usePollFarmsPublicData } from 'state/farms/hooks'
@@ -132,7 +131,6 @@ const Pools: React.FC = () => {
 
   usePollFarmsPublicData()
   useFetchCakeVault()
-  useFetchIfoPool()
   useFetchPublicPoolsData()
   useFetchUserPools(account)
 

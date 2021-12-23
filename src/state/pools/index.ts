@@ -9,8 +9,6 @@ import {
   VaultFees,
   VaultUser,
   AppThunk,
-  IfoVaultUser,
-  IfoCakeVault,
 } from 'state/types'
 import { getPoolApr } from 'utils/apr'
 import { getBalanceNumber } from 'utils/formatBalance'
@@ -22,9 +20,7 @@ import {
   fetchUserPendingRewards,
 } from './fetchPoolsUser'
 import { fetchPublicVaultData, fetchVaultFees } from './fetchVaultPublic'
-import { fetchIfoPoolFeesData, fetchPublicIfoPoolData } from './fetchIfoPoolPublic'
 import fetchVaultUser from './fetchVaultUser'
-import fetchIfoPoolUserData from './fetchIfoPoolUser'
 import { getTokenPricesFromFarm } from './helpers'
 
 export const initialPoolVaultState = Object.freeze({
@@ -54,7 +50,6 @@ const initialState: PoolsState = {
   data: [...poolsConfig],
   userDataLoaded: false,
   cakeVault: initialPoolVaultState,
-  ifoPool: initialPoolVaultState,
 }
 
 // Thunks
@@ -183,24 +178,6 @@ export const fetchCakeVaultUserData = createAsyncThunk<VaultUser, { account: str
   },
 )
 
-export const fetchIfoPoolPublicData = createAsyncThunk<IfoCakeVault>('ifoPool/fetchPublicData', async () => {
-  const publicVaultInfo = await fetchPublicIfoPoolData()
-  return publicVaultInfo
-})
-
-export const fetchIfoPoolFees = createAsyncThunk<VaultFees>('ifoPool/fetchFees', async () => {
-  const vaultFees = await fetchIfoPoolFeesData()
-  return vaultFees
-})
-
-export const fetchIfoPoolUserAndCredit = createAsyncThunk<IfoVaultUser, { account: string }>(
-  'ifoPool/fetchUser',
-  async ({ account }) => {
-    const userData = await fetchIfoPoolUserData(account)
-    return userData
-  },
-)
-
 export const PoolsSlice = createSlice({
   name: 'Pools',
   initialState,
@@ -244,21 +221,6 @@ export const PoolsSlice = createSlice({
       const userData = action.payload
       userData.isLoading = false
       state.cakeVault = { ...state.cakeVault, userData }
-    })
-    // Vault public data that updates frequently
-    builder.addCase(fetchIfoPoolPublicData.fulfilled, (state, action) => {
-      state.ifoPool = { ...state.ifoPool, ...action.payload }
-    })
-    // Vault fees
-    builder.addCase(fetchIfoPoolFees.fulfilled, (state, action: PayloadAction<VaultFees>) => {
-      const fees = action.payload
-      state.ifoPool = { ...state.ifoPool, fees }
-    })
-    // Vault user data
-    builder.addCase(fetchIfoPoolUserAndCredit.fulfilled, (state, action) => {
-      const userData = action.payload
-      userData.isLoading = false
-      state.ifoPool = { ...state.ifoPool, userData }
     })
   },
 })

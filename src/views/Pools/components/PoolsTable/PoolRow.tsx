@@ -45,15 +45,11 @@ const PoolRow: React.FC<PoolRowProps> = ({ pool, account, userDataLoaded }) => {
       <StyledRow role="row" onClick={toggleExpanded}>
         <NameCell pool={pool} />
         {pool.vaultKey ? (
-          ((isXLargerScreen && pool.vaultKey === VaultKey.IfoPool) || pool.vaultKey === VaultKey.CakeVault) && (
-            <AutoEarningsCell pool={pool} account={account} userDataLoaded={userDataLoaded} />
-          )
+          <AutoEarningsCell pool={pool} account={account} userDataLoaded={userDataLoaded} />
         ) : (
           <EarningsCell pool={pool} account={account} userDataLoaded={userDataLoaded} />
         )}
-        {pool.vaultKey === VaultKey.IfoPool ? (
-          <AvgBalanceCell pool={pool} account={account} userDataLoaded={userDataLoaded} />
-        ) : isXLargerScreen && isPoolZero ? (
+        {isXLargerScreen && isPoolZero ? (
           <StakedCell pool={pool} account={account} userDataLoaded={userDataLoaded} />
         ) : null}
         {isLargerScreen && !isPoolZero && <TotalStakedCell pool={pool} />}

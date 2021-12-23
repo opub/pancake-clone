@@ -65,7 +65,7 @@ export const useVaultApprove = (vaultKey: VaultKey, setLastUpdated: () => void) 
   const [requestedApproval, setRequestedApproval] = useState(false)
   const { t } = useTranslation()
   const { toastSuccess, toastError } = useToast()
-  const vaultPoolContract = useVaultPoolContract(vaultKey)
+  const vaultPoolContract = useVaultPoolContract()
   const { callWithGasPrice } = useCallWithGasPrice()
   const cakeContract = useCake()
 
@@ -95,7 +95,7 @@ export const useCheckVaultApprovalStatus = (vaultKey: VaultKey) => {
   const [isVaultApproved, setIsVaultApproved] = useState(false)
   const { account } = useWeb3React()
   const cakeContract = useCake()
-  const vaultPoolContract = useVaultPoolContract(vaultKey)
+  const vaultPoolContract = useVaultPoolContract()
   const { lastUpdated, setLastUpdated } = useLastUpdated()
   useEffect(() => {
     const checkApprovalStatus = async () => {

@@ -5,7 +5,7 @@ import { orderBy } from 'lodash'
 import { VaultKey, DeserializedPool } from 'state/types'
 import { fetchCakeVaultFees, fetchPoolsPublicDataAsync } from 'state/pools'
 import { simpleRpcProvider } from 'utils/providers'
-import { useCakeVault, useIfoPoolVault, usePools } from 'state/pools/hooks'
+import { useCakeVault, usePools } from 'state/pools/hooks'
 import { getAprData } from 'views/Pools/helpers'
 
 enum FetchStatus {
@@ -18,24 +18,17 @@ enum FetchStatus {
 export function usePoolsWithVault() {
   const { pools: poolsWithoutAutoVault } = usePools()
   const cakeVault = useCakeVault()
-  const ifoPool = useIfoPoolVault()
   const pools = useMemo(() => {
     const activePools = poolsWithoutAutoVault.filter((pool) => !pool.isFinished)
     const cakePool = activePools.find((pool) => pool.sousId === 0)
     const cakeAutoVault = { ...cakePool, vaultKey: VaultKey.CakeVault }
-    const ifoPoolVault = { ...cakePool, vaultKey: VaultKey.IfoPool }
     const cakeAutoVaultWithApr = {
       ...cakeAutoVault,
       apr: getAprData(cakeAutoVault, cakeVault.fees.performanceFeeAsDecimal).apr,
       rawApr: cakePool.apr,
     }
-    const ifoPoolWithApr = {
-      ...ifoPoolVault,
-      apr: getAprData(ifoPoolVault, ifoPool.fees.performanceFeeAsDecimal).apr,
-      rawApr: cakePool.apr,
-    }
-    return [ifoPoolWithApr, cakeAutoVaultWithApr, ...poolsWithoutAutoVault]
-  }, [poolsWithoutAutoVault, cakeVault.fees.performanceFeeAsDecimal, ifoPool.fees.performanceFeeAsDecimal])
+    return [cakeAutoVaultWithApr, ...poolsWithoutAutoVault]
+  }, [poolsWithoutAutoVault, cakeVault.fees.performanceFeeAsDecimal])
 
   return pools
 }

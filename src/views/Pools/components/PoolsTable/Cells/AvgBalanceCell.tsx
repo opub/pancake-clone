@@ -1,13 +1,9 @@
-import { Box, Flex, HelpIcon, Skeleton, Text, useMatchBreakpoints, useTooltip } from '@pancakeswap/uikit'
-import BigNumber from 'bignumber.js'
+import { Box, Flex, Skeleton, Text, useMatchBreakpoints, useTooltip } from '@pancakeswap/uikit'
 import Balance from 'components/Balance'
 import { useTranslation } from 'contexts/Localization'
 import React from 'react'
-import { usePriceCakeBusd } from 'state/farms/hooks'
-import { useIfoPoolCredit } from 'state/pools/hooks'
 import { DeserializedPool } from 'state/types'
 import styled from 'styled-components'
-import { getBalanceNumber, getDecimalAmount } from 'utils/formatBalance'
 import BaseCell, { CellContent } from './BaseCell'
 
 interface AvgBalanceCellProps {
@@ -33,17 +29,9 @@ const HelpIconWrapper = styled.div`
 const AvgBalanceCell: React.FC<AvgBalanceCellProps> = ({ pool, account, userDataLoaded }) => {
   const { t } = useTranslation()
   const { isMobile } = useMatchBreakpoints()
-  const credit = useIfoPoolCredit()
-
-  const hasCredit = credit.gt(0)
 
   // TODO: refactor this is use everywhere
-  const cakeAsNumberBalance = getBalanceNumber(credit)
-  const cakeAsBigNumber = getDecimalAmount(new BigNumber(cakeAsNumberBalance))
-  const cakePriceBusd = usePriceCakeBusd()
-  const stakedDollarValue = cakePriceBusd.gt(0)
-    ? getBalanceNumber(cakeAsBigNumber.multipliedBy(cakePriceBusd), pool.stakingToken.decimals)
-    : 0
+  const stakedDollarValue = 0
 
   const labelText = t('Average') + t('Pool Balance')
 
@@ -71,31 +59,14 @@ const AvgBalanceCell: React.FC<AvgBalanceCellProps> = ({ pool, account, userData
                   mt="4px"
                   bold={!isMobile}
                   fontSize={isMobile ? '14px' : '16px'}
-                  color={hasCredit ? 'primary' : 'textDisabled'}
-                  decimals={hasCredit ? 5 : 1}
-                  value={hasCredit ? cakeAsNumberBalance : 0}
+                  color="textDisabled"
+                  decimals={1}
+                  value={0}
                 />
-                {hasCredit ? (
-                  <Balance
-                    display="inline"
-                    fontSize="12px"
-                    color="textSubtle"
-                    decimals={2}
-                    prefix="~"
-                    value={stakedDollarValue}
-                    unit=" USD"
-                  />
-                ) : (
                   <Text mt="4px" fontSize="12px" color="textDisabled">
                     0 USD
                   </Text>
-                )}
               </Box>
-              {hasCredit && !isMobile && (
-                <HelpIconWrapper ref={targetRef}>
-                  <HelpIcon color="textSubtle" />
-                </HelpIconWrapper>
-              )}
             </Flex>
           </>
         )}

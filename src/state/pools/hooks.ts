@@ -5,8 +5,6 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch } from 'state'
 import { simpleRpcProvider } from 'utils/providers'
 import useRefresh from 'hooks/useRefresh'
-import { BIG_ZERO } from 'utils/bigNumber'
-import { getAprData } from 'views/Pools/helpers'
 import {
   fetchPoolsPublicDataAsync,
   fetchPoolsUserDataAsync,
@@ -14,9 +12,6 @@ import {
   fetchCakeVaultUserData,
   fetchCakeVaultFees,
   fetchPoolsStakingLimitsAsync,
-  fetchIfoPoolFees,
-  fetchIfoPoolPublicData,
-  fetchIfoPoolUserAndCredit,
   initialPoolVaultState,
 } from '.'
 import { State, DeserializedPool, VaultKey } from '../types'
@@ -81,33 +76,13 @@ export const useFetchCakeVault = () => {
   }, [dispatch])
 }
 
-export const useFetchIfoPool = () => {
-  const { account } = useWeb3React()
-  const { fastRefresh } = useRefresh()
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(fetchIfoPoolPublicData())
-  }, [dispatch, fastRefresh])
-
-  useEffect(() => {
-    dispatch(fetchIfoPoolUserAndCredit({ account }))
-  }, [dispatch, fastRefresh, account])
-
-  useEffect(() => {
-    dispatch(fetchIfoPoolFees())
-  }, [dispatch])
-}
-
 export const useCakeVault = () => {
   return useVaultPoolByKey(VaultKey.CakeVault)
 }
 
 export const useVaultPools = () => {
   return {
-    [VaultKey.CakeVault]: useVaultPoolByKey(VaultKey.CakeVault),
-    [VaultKey.IfoPool]: useVaultPoolByKey(VaultKey.IfoPool),
-  }
+    [VaultKey.CakeVault]: useVaultPoolByKey(VaultKey.CakeVault),  }
 }
 
 export const useVaultPoolByKey = (key: VaultKey) => {
@@ -177,42 +152,5 @@ export const useVaultPoolByKey = (key: VaultKey) => {
       lastDepositedTime,
       lastUserActionTime,
     },
-  }
-}
-
-export const useIfoPoolVault = () => {
-  return useVaultPoolByKey(VaultKey.IfoPool)
-}
-
-export const useIfoPooStartBlock = () => {
-  return useSelector((state: State) => state.pools.ifoPool.creditStartBlock)
-}
-
-export const useIfoPoolCredit = () => {
-  const creditAsString = useSelector((state: State) => state.pools.ifoPool.userData?.credit ?? BIG_ZERO)
-  const credit = useMemo(() => {
-    return new BigNumber(creditAsString)
-  }, [creditAsString])
-
-  return credit
-}
-
-export const useIfoWithApr = () => {
-  const {
-    fees: { performanceFeeAsDecimal },
-  } = useIfoPoolVault()
-  const { pool: poolZero, userDataLoaded } = usePool(0)
-
-  const ifoPoolWithApr = useMemo(() => {
-    const ifoPool = { ...poolZero }
-    ifoPool.vaultKey = VaultKey.IfoPool
-    ifoPool.apr = getAprData(ifoPool, performanceFeeAsDecimal).apr
-    ifoPool.rawApr = poolZero.apr
-    return ifoPool
-  }, [performanceFeeAsDecimal, poolZero])
-
-  return {
-    pool: ifoPoolWithApr,
-    userDataLoaded,
   }
 }

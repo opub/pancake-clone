@@ -15,16 +15,6 @@ export const vaultPoolConfig = {
       secondarySrc: '/images/tokens/autorenew.svg',
     },
   },
-  [VaultKey.IfoPool]: {
-    name: 'IFO CAKE',
-    description: 'Stake CAKE to participate in IFO',
-    autoCompoundFrequency: 1,
-    gasLimit: 500000,
-    tokenImage: {
-      primarySrc: `/images/tokens/${tokens.cake.address}.svg`,
-      secondarySrc: `/images/tokens/${tokens.cake.address}.svg`,
-    },
-  },
 } as const
 
 const pools: SerializedPoolConfig[] = [

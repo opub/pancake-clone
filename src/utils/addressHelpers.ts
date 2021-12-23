@@ -14,9 +14,6 @@ export const getMasterChefAddress = () => {
 export const getMulticallAddress = () => {
   return getAddress(addresses.multiCall)
 }
-export const getLotteryV2Address = () => {
-  return getAddress(addresses.lotteryV2)
-}
 export const getPancakeProfileAddress = () => {
   return getAddress(addresses.pancakeProfile)
 }
@@ -29,20 +26,8 @@ export const getBunnyFactoryAddress = () => {
 export const getClaimRefundAddress = () => {
   return getAddress(addresses.claimRefund)
 }
-export const getPointCenterIfoAddress = () => {
-  return getAddress(addresses.pointCenterIfo)
-}
 export const getBunnySpecialAddress = () => {
   return getAddress(addresses.bunnySpecial)
-}
-export const getTradingCompetitionAddress = () => {
-  return getAddress(addresses.tradingCompetition)
-}
-export const getTradingCompetitionAddressV2 = () => {
-  return getAddress(addresses.tradingCompetitionV2)
-}
-export const getEasterNftAddress = () => {
-  return getAddress(addresses.easterNft)
 }
 
 export const getVaultPoolAddress = (vaultKey: VaultKey) => {
@@ -54,12 +39,6 @@ export const getVaultPoolAddress = (vaultKey: VaultKey) => {
 
 export const getCakeVaultAddress = () => {
   return getAddress(addresses.cakeVault)
-}
-export const getIfoPoolAddress = () => {
-  return getAddress(addresses.ifoPool)
-}
-export const getPredictionsAddress = () => {
-  return getAddress(addresses.predictions)
 }
 export const getChainlinkOracleAddress = () => {
   return getAddress(addresses.chainlinkOracle)
@@ -78,12 +57,6 @@ export const getFarmAuctionAddress = () => {
 }
 export const getAnniversaryAchievement = () => {
   return getAddress(addresses.AnniversaryAchievement)
-}
-export const getNftMarketAddress = () => {
-  return getAddress(addresses.nftMarket)
-}
-export const getNftSaleAddress = () => {
-  return getAddress(addresses.nftSale)
 }
 export const getPancakeSquadAddress = () => {
   return getAddress(addresses.pancakeSquad)

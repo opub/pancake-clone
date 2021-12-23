@@ -53,11 +53,6 @@ const HasSharesActions: React.FC<HasStakeActionProps> = ({ pool, stakingTokenBal
           ) : (
             <Skeleton mt="1px" height={16} width={64} />
           )}
-          {!isLoading && totalSharesPercentage && pool.vaultKey === VaultKey.IfoPool && (
-            <Box as="span" ml="2px">
-              | {t('%num% of total', { num: `${totalSharesPercentage.toString()}%` })}
-            </Box>
-          )}
         </Text>
       </Flex>
       <Flex>

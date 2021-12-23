@@ -1,16 +1,12 @@
 import BigNumber from 'bignumber.js'
-import Balance from 'components/Balance'
 import React from 'react'
 import styled from 'styled-components'
 import { Flex, Text, Box, Skeleton } from '@pancakeswap/uikit'
 import { useTranslation } from 'contexts/Localization'
 import { DeserializedPool, VaultKey } from 'state/types'
 import { BIG_ZERO } from 'utils/bigNumber'
-import { useIfoPoolCredit } from 'state/pools/hooks'
-import { usePriceCakeBusd } from 'state/farms/hooks'
 import QuestionHelper from 'components/QuestionHelper'
 import { FlexGap } from 'components/Layout/Flex'
-import { getBalanceNumber, getDecimalAmount } from 'utils/formatBalance'
 import VaultApprovalAction from './VaultApprovalAction'
 import VaultStakeActions from './VaultStakeActions'
 import { useCheckVaultApprovalStatus } from '../../../hooks/useApprove'
@@ -21,15 +17,7 @@ const InlineText = styled(Text)`
 
 export const IfoVaultCardAvgBalance = ({ pool }: { pool: DeserializedPool }) => {
   const { t } = useTranslation()
-  const credit = useIfoPoolCredit()
-
-  // TODO: refactor this is use everywhere
-  const cakeAsNumberBalance = getBalanceNumber(credit)
-  const cakeAsBigNumber = getDecimalAmount(new BigNumber(cakeAsNumberBalance))
-  const cakePriceBusd = usePriceCakeBusd()
-  const stakedDollarValue = cakePriceBusd.gt(0)
-    ? getBalanceNumber(cakeAsBigNumber.multipliedBy(cakePriceBusd), pool.stakingToken.decimals)
-    : 0
+  const stakedDollarValue =  0
 
   return (
     <>
@@ -49,16 +37,6 @@ export const IfoVaultCardAvgBalance = ({ pool }: { pool: DeserializedPool }) => 
           )}
         />
       </FlexGap>
-      <Flex flexDirection="column" pb="16px">
-        <Balance fontSize="20px" bold value={cakeAsNumberBalance} decimals={5} />
-        <Text fontSize="12px" color="textSubtle" display="flex">
-          {cakePriceBusd.gt(0) ? (
-            <Balance value={stakedDollarValue} fontSize="12px" color="textSubtle" decimals={2} prefix="~" unit=" USD" />
-          ) : (
-            <Skeleton mt="1px" height={16} width={64} />
-          )}
-        </Text>
-      </Flex>
     </>
   )
 }
@@ -78,7 +56,6 @@ const CakeVaultCardActions: React.FC<{
   return (
     <Flex flexDirection="column">
       <Flex flexDirection="column">
-        {isVaultApproved && pool.vaultKey === VaultKey.IfoPool && <IfoVaultCardAvgBalance pool={pool} />}
         <Box display="inline">
           <InlineText
             color={accountHasSharesStaked ? 'secondary' : 'textSubtle'}
