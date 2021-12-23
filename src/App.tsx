@@ -47,8 +47,7 @@ BigNumber.config({
 })
 
 const App: React.FC = () => {
-  const { account } = useWeb3React()
-
+  useWeb3React()
   usePollBlockNumber()
   useEagerConnect()
   useFetchProfile()

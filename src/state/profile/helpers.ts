@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie'
 import { Profile } from 'state/types'
 import { GetUserProfileResponse } from 'utils/types'
 import { getProfileContract } from 'utils/contractHelpers'
@@ -9,7 +8,7 @@ export interface GetProfileResponse {
 }
 
 const transformProfileResponse = (profileResponse: GetUserProfileResponse): Partial<Profile> => {
-  const { 0: userId, 1: numberPoints, 2: teamId, 3: collectionAddress, 4: tokenId, 5: isActive } = profileResponse
+  const { 0: userId, 1: numberPoints, 4: tokenId, 5: isActive } = profileResponse
 
   return {
     userId: userId.toNumber(),
@@ -47,7 +46,7 @@ export const getProfile = async (address: string): Promise<GetProfileResponse> =
     }
 
     const profileResponse = await profileContract.getUserProfile(address)
-    const { userId, points, tokenId, isActive } = transformProfileResponse(profileResponse)
+    const { userId, points, isActive } = transformProfileResponse(profileResponse)
     const username = await getUsername(address)
 
     const profile = {

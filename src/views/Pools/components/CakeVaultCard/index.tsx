@@ -6,16 +6,13 @@ import {
   Flex,
   Text,
   CardProps,
-  HelpIcon,
-  useTooltip,
-  LinkExternal,
   TokenPairImage,
 } from '@pancakeswap/uikit'
 import { useTranslation } from 'contexts/Localization'
 import { useWeb3React } from '@web3-react/core'
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import { useVaultPoolByKey } from 'state/pools/hooks'
-import { DeserializedPool, VaultKey } from 'state/types'
+import { DeserializedPool } from 'state/types'
 import { convertSharesToCake } from 'views/Pools/helpers'
 import { FlexGap } from 'components/Layout/Flex'
 import { vaultPoolConfig } from 'config/constants/pools'
@@ -45,19 +42,6 @@ const CakeVaultCard: React.FC<CakeVaultProps> = ({ pool, showStakedOnly, default
     fees: { performanceFeeAsDecimal },
     pricePerFullShare,
   } = useVaultPoolByKey(pool.vaultKey)
-  const { tooltip, tooltipVisible, targetRef } = useTooltip(
-    <>
-      <Text>
-        {t(
-          'The start block of the current calculation period. Your average IFO CAKE Pool staking balance is calculated throughout this period.',
-        )}
-      </Text>
-      <LinkExternal href="https://medium.com/pancakeswap/initial-farm-offering-ifo-3-0-ifo-staking-pool-622d8bd356f1">
-        {t('Check out our Medium article for more details.')}
-      </LinkExternal>
-    </>,
-    { placement: 'auto' },
-  )
 
   const { cakeAsBigNumber } = convertSharesToCake(userShares, pricePerFullShare)
 

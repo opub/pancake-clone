@@ -91,7 +91,7 @@ export const useVaultApprove = (vaultKey: VaultKey, setLastUpdated: () => void) 
   return { handleApprove, requestedApproval }
 }
 
-export const useCheckVaultApprovalStatus = (vaultKey: VaultKey) => {
+export const useCheckVaultApprovalStatus = () => {
   const [isVaultApproved, setIsVaultApproved] = useState(false)
   const { account } = useWeb3React()
   const cakeContract = useCake()
